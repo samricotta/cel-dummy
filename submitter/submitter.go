@@ -1,8 +1,13 @@
 package submitter
 
 import (
+	"context"
+	"errors"
+	"github.com/celestiaorg/celestia-app/x/payment"
 	"github.com/celestiaorg/celestia-app/x/payment/types"
-	"github.com/renaynay/sam-app/util"
+	"github.com/samricotta/cel-dummy/util"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // Submitter contains all components necessary to be able
@@ -27,4 +32,24 @@ func (s *Submitter) Submit(namespaceID []byte, data []byte, gasLim uint64) (int6
 	if err != nil {
 		return 0, err
 	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer func() {
+		cancel()
+	}()
+	// dial the gRPC endpoint
+	client, err := grpc.DialContext(ctx, s.endpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return 0, err
+	}
+
+	resp, err := payment.SubmitPayForData(ctx, s.signer, client, namespaceID, data, gasLim)
+	if err != nil {
+		return 0, err
+	}
+	// if height is 0, an error occurred, return
+	if resp.Height == 0 {
+		return 0, errors.New(resp.Info)
+	}
+	return resp.Height, nil
 }

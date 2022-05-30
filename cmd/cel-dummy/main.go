@@ -2,10 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
+	"fmt"
 	"github.com/celestiaorg/celestia-app/app"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	dummy "github.com/samricotta/cel-dummy"
 	"github.com/spf13/cobra"
 	"os"
+	"strconv"
 )
 
 // Commands
@@ -71,4 +75,76 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
+}
+
+func submit(cmd *cobra.Command, args []string) {
+	// parse arguments
+	namespaceID, data, gasLim, err := parseSubmitArgs(args[0], args[1], args[2])
+	if err != nil {
+		fmt.Println("Err while parsing submit arguments: ", err)
+		os.Exit(1)
+	}
+	// construct the dummy app
+	dummy, err := dummy.NewDummy(dummy.DefaultConfig())
+	if err != nil {
+		fmt.Println("Err while constructing new dummy: ", err)
+		os.Exit(1)
+	}
+	resp, err := dummy.Submit(namespaceID, data, gasLim)
+	if err != nil {
+		fmt.Println("Err while submitting PayForData: ", err)
+		os.Exit(1)
+
+	}
+	fmt.Println("Message successfully submitted at block height: ", resp)
+}
+
+func retrieve(cmd *cobra.Command, args []string) {
+	namespaceID, blockHeight, err := parseRetrieveArgs(args[0], args[1])
+	if err != nil {
+		fmt.Println("Err while parsing submit arguments: ", err)
+		os.Exit(1)
+	}
+	fmt.Println(namespaceID, blockHeight)
+	// construct the dummy app
+	dummy, err := dummy.NewDummy(dummy.DefaultConfig())
+	if err != nil {
+		fmt.Println("Err while constructing new dummy: ", err)
+		os.Exit(1)
+	}
+	resp, err := dummy.Retrieve(namespaceID, blockHeight)
+	if err != nil {
+		fmt.Println("Err while retrieving namespaced data: ", err)
+		os.Exit(1)
+	}
+	fmt.Println("Message retrieved: ", resp)
+}
+
+func parseSubmitArgs(namespaceID string, data string, gasLim string) ([]byte, []byte, uint64, error) {
+	nID := []byte(namespaceID)
+	dataBytes := []byte(data)
+
+	gasLimInt, err := strconv.Atoi(gasLim)
+	if err != nil {
+		return []byte{}, []byte{}, 0, err
+	}
+
+	return nID, dataBytes, uint64(gasLimInt), nil
+}
+
+// parseRetrieveArgs takes in the namespaceID and blockHeight as strings,
+// and returns the namespaceID as a hexadecimal string, the block height as an
+// int64, and an error.
+func parseRetrieveArgs(namespaceID string, blockHeight string) (string, int64, error) {
+	// TODO @sam
+	// cast namespaceID to bytes
+	// encode namespaceIDbytes to hex
+	nID := hex.EncodeToString([]byte(namespaceID))
+
+	height, err := strconv.Atoi(blockHeight)
+	if err != nil {
+		return "", 0, err
+	}
+
+	return nID, int64(height), nil
 }
