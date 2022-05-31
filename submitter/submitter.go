@@ -3,6 +3,7 @@ package submitter
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/celestiaorg/celestia-app/x/payment"
 	"github.com/celestiaorg/celestia-app/x/payment/types"
 	"github.com/samricotta/cel-dummy/util"
@@ -30,6 +31,7 @@ func (s *Submitter) Submit(namespaceID []byte, data []byte, gasLim uint64) (int6
 	// sanity check the length of the namespaceID
 	err := util.CheckNamespaceLength(namespaceID)
 	if err != nil {
+		fmt.Printf("%#v", err)
 		return 0, err
 	}
 
@@ -40,15 +42,18 @@ func (s *Submitter) Submit(namespaceID []byte, data []byte, gasLim uint64) (int6
 	// dial the gRPC endpoint
 	client, err := grpc.DialContext(ctx, s.endpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
+		fmt.Printf("%#v", client)
 		return 0, err
 	}
 
 	resp, err := payment.SubmitPayForData(ctx, s.signer, client, namespaceID, data, gasLim)
 	if err != nil {
+		fmt.Printf("%#v", err)
 		return 0, err
 	}
 	// if height is 0, an error occurred, return
 	if resp.Height == 0 {
+		fmt.Printf("%#v%v\n", resp)
 		return 0, errors.New(resp.Info)
 	}
 	return resp.Height, nil

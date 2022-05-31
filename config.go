@@ -18,7 +18,6 @@ type Config struct {
 func DefaultConfig() Config {
 	ksPath, err := filepath.Abs("./keys")
 	if err != nil {
-		panic(err)
 	}
 
 	return Config{

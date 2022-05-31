@@ -92,7 +92,8 @@ func submit(cmd *cobra.Command, args []string) {
 	}
 	resp, err := dummy.Submit(namespaceID, data, gasLim)
 	if err != nil {
-		fmt.Println("Err while submitting PayForData: ", err)
+		panic(err)
+		fmt.Printf("Err while submitting PayForData: %v\n", err)
 		os.Exit(1)
 
 	}
