@@ -23,8 +23,8 @@ func DefaultConfig() Config {
 	return Config{
 		KeystorePath: ksPath,
 		// Hardcoded endpoint of celestia app
-		AppEndpoint: "46.101.42.40:9090",
+		AppEndpoint: "rpc-mamaki.pops.one:9090",
 		// Hardcoded endpoint of celestia light node
-		NodeEndpoint: "127.0.0.1:26658",
+		NodeEndpoint: "194.59.158.221:26658",
 	}
 }
