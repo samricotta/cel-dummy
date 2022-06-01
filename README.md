@@ -1,8 +1,11 @@
 # Celestia Dummy Application
 
-The application's purpose is to send and receive messages to both the celestia app and celestia node. 
-A POST request is sent with the a namespace id, message and gas limit. A response is sent back which is inclusive of the
-block height. To receive a message, a GET request is sent along with the block height and retrieves the assigned message.
+
+The application's purpose is to send and receive messages to/from the celestia network.
+
+To submit a message, an HTTP POST request is made with the a namespace id, message and gas limit included in the body of the request and a block height is returned upon success.
+
+To retrieve a message, a GET request is made to the /namespaced_data/{nID}/height/{height} endpoint that includes the namespaceID under which the user submitted their message, and the block height at which the message was included.
 
 ## Installation
 
@@ -39,3 +42,5 @@ Response:
 Message retrieved: <message>
 ```
 
+## Resources
+https://docs.celestia.org/developers/overview/
