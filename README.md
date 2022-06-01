@@ -43,4 +43,4 @@ Message retrieved: <message>
 ```
 
 ## Resources
-https://docs.celestia.org/developers/celestia-node
+https://docs.celestia.org/developers/node-api
